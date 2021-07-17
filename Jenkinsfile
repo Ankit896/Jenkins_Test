@@ -34,4 +34,6 @@ pipeline {
                             archiveArtifacts "cpd/*.xml"
                         }
                     }
+		}
+	}
 }
