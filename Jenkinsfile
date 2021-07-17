@@ -19,7 +19,7 @@ pipeline {
             }
         }
 	    stage ('Static Code Analysis'){
-		    steps{"
+		    steps{
 			    sh "mvn findbugs:findbugs"
 		    }
 	    }
