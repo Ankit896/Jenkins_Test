@@ -23,6 +23,4 @@ pipeline {
 			    sh "mvn findbugs:findbugs"
 		    }
 	    }
- 
-	
-    }
+ }
