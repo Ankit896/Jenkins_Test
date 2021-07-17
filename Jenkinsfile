@@ -1,39 +1,40 @@
-// Declarative //
-pipeline {
-    agent any
-
-   stage('Static code analysis') {
-            steps {
-                //Use parallel method for parallel processing
-                parallel(
-                    'Static code analysis' : {
-                        gradlew 'check -x test'
-
-                        //You can specify the current directory with the dir method
-                        dir(reportDir) {
-                            step([
-                                $class: 'CheckStylePublisher',
-                                pattern: "checkstyle/*.xml"
-                            ])
-                            step([
-                                $class: 'FindBugsPublisher',
-                                pattern: "findbugs/*.xml"
-                            ])
-                            step([
-                                $class: 'PmdPublisher',
-                                pattern: "pmd/*.xml"
-                            ])
-                            step([
-                                $class: 'DryPublisher',
-                                pattern: "cpd/*.xml"
-                            ])
-                
-                            archiveArtifacts "checkstyle/*.xml"
-                            archiveArtifacts "findbugs/*.xml"
-                            archiveArtifacts "pmd/*.xml"
-                            archiveArtifacts "cpd/*.xml"
-                        }
-                    }
-		}
-	}
+node {
+    stage ('Checkout') {
+        git branch:'master', url: 'file:///Users/hafner/Development/git/analysis-model'
+    }
+ 
+    stage ('Build') {
+        def mvnHome = tool 'mvn-default'
+ 
+        sh "${mvnHome}/bin/mvn --batch-mode -V -U -e clean test -Dsurefire.useFile=false"
+ 
+        junit testResults: '**/target/surefire-reports/TEST-*.xml'
+ 
+        def java = scanForIssues tool: [$class: 'Java']
+        def javadoc = scanForIssues tool: [$class: 'JavaDoc']
+         
+        publishIssues issues:[java]
+        publishIssues issues:[javadoc]
+    }
+ 
+    stage ('Analysis') {
+        def mvnHome = tool 'mvn-default'
+ 
+        sh "${mvnHome}/bin/mvn -batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs spotbugs:spotbugs"
+ 
+        def checkstyle = scanForIssues tool: [$class: 'CheckStyle'], pattern: '**/target/checkstyle-result.xml'
+        publishIssues issues:[checkstyle]
+    
+        def pmd = scanForIssues tool: [$class: 'Pmd'], pattern: '**/target/pmd.xml'
+        publishIssues issues:[pmd]
+         
+        def cpd = scanForIssues tool: [$class: 'Cpd'], pattern: '**/target/cpd.xml'
+        publishIssues issues:[cpd]
+         
+        def findbugs = scanForIssues tool: [$class: 'FindBugs'], pattern: '**/target/findbugsXml.xml'
+        publishIssues issues:[findbugs]
+ 
+        def spotbugs = scanForIssues tool: [$class: 'SpotBugs'], pattern: '**/target/spotbugsXml.xml'
+        publishIssues issues:[spotbugs]
+    }
 }
