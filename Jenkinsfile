@@ -18,6 +18,13 @@ pipeline {
                 echo 'Deploying....'
             }
         }
+	    stage ('Static Code Analysis'){
+		    steps{
+		    bat "mvn pmd:pmd"
+			    bat "mvn checkstyle:checkstyle"
+			    bat "mvn findbugs:findbugs"
+		    }
+	    }
  
 	}
 }
