@@ -18,7 +18,11 @@ pipeline {
                 echo 'Deploying....'
             }
         }
-	
+	    stage ('Static Code Analysis'){
+		    steps{"
+			    sh "mvn findbugs:findbugs"
+		    }
+	    }
  
 	}
 }
