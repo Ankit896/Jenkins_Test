@@ -18,7 +18,7 @@ pipeline {
                 echo 'Deploying....'
             }
         }
-         stage('Static code analysis') {
+        stage('Static code analysis') {
             steps {
                 //Use parallel method for parallel processing
                 parallel(
@@ -50,6 +50,6 @@ pipeline {
                             archiveArtifacts "cpd/*.xml"
                         }
                     }
-    
+    }
 }
 
