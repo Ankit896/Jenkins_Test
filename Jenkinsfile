@@ -49,7 +49,9 @@ pipeline {
                             archiveArtifacts "pmd/*.xml"
                             archiveArtifacts "cpd/*.xml"
                         }
-                    },
-    }
+                    }
+    		}
+	}
+	}
 }
 
