@@ -15,7 +15,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh mvn 'pmd:pmd'
+                
                 echo 'Deploying....'
             }
         }
